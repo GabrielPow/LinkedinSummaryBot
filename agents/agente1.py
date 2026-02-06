@@ -18,14 +18,40 @@ tools = [
   {"url_context": {}},
 ]
 
+
 def build_search(url: str) -> str:
-    response = client.models.generate_content(
-        model=model_id,
-        contents=f"Summarize the most important facts and developments within the article given below {url}",
-        config=GenerateContentConfig(
-            tools=tools,
-            )
-    )
+    '''
+    Based on what it receives, will generate an summary based on what it receives, can be an article or anything it receives
+    '''
+    try:
+        response = client.models.generate_content(
+            model=model_id,
+            contents=f"""
+            You are an expert at analyzing articles and extracting key information.
+            
+            Read the following article and create a concise summary with bullet points covering:
+                - The main topic or thesis
+                - Key facts, statistics, or findings
+                - Important arguments or perspectives presented
+                - Notable quotes or expert opinions (if any)
+                - Practical implications or takeaways
+                
+                Focus on the most important and actionable information. Each bullet point should be 1-2 sentences maximum.
+                
+                Format your response as clear, scannable bullet points using • or - symbols.
+                
+                Article:
+                    {url}
+                    
+                    Summary:
+                        """,
+                        config=GenerateContentConfig(
+                            tools=tools,
+                            )
+                        )
+    except Exception as e:
+        return f"Error generating summary: {str(e)}"
+        
     for each in response.candidates[0].content.parts:
         print(each.text)
     
