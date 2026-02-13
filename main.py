@@ -1,16 +1,11 @@
 import pandas as pd
-import os
-from dotenv import load_dotenv
-from google import genai
 #%%
 from agents.agente1 import build_search
 from agents.agente2 import build_summary
 #%%
 from docx import Document  
 #%%
-from agents.agente2 import build_context
-#%%
-tester = build_context("Ce")
+from agents.agente3 import build_translation
 #%%
 def article_building(arttype: str) -> str:
     articles = pd.read_excel("./data/articles.xlsx",header=0,usecols="B:E", dtype="object")
@@ -32,19 +27,20 @@ def article_building(arttype: str) -> str:
     
     return agent2_response
 #%%
-response = article_building()
+response = article_building("Ar")
 #%%
 document = Document()
 
 document.add_paragraph(response)
 
-document.save('./output/response.docx')
+#%%
+translation = build_translation("brazillian portuguese", response)
 
 #%%
-url = "https://www.geekwire.com/2026/amazon-confirms-16000-more-job-cuts-bringing-total-layoffs-to-30000-since-october/"
-agent1_response = build_search(url)
-print(agent1_response)
+
+document.add_paragraph(translation)
+
+document.save('./output/response.docx')
 #%%
-agent2_response = build_summary(agent1_response,"Ar")
-print(agent2_response)
+
 
